@@ -26,3 +26,4 @@ You can now use the recipes defined inside the `Justfile` to deploy the applicat
 - `just compose-down-dev`
 - `just compose-up-prd` 
 - `just compose-down-prd`
+# test
