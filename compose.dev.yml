@@ -1,0 +1,70 @@
+name: time_manager 
+
+volumes:
+  postgres-data:
+  deps_data:
+
+networks:
+  backend:
+  frontend:
+
+services:
+
+  postgres:
+    container_name: time_manager_postgres_dev
+    image: docker.io/postgres
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    env_file: .env.dev
+    restart: unless-stopped
+    volumes: 
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  phoenix:
+    container_name: time_manager_phoenix_api_dev
+    image: localhost/phoenix_api:dev
+    pull_policy: build 
+    build:
+      context: ./api
+      dockerfile: Containerfile.dev
+      network: host
+    env_file: .env.dev
+    depends_on:
+      - postgres
+    ports:
+      - "4000:4000"
+    networks:
+      - backend 
+      - frontend
+    # Mounting project files as a volume to make a devcontainer
+    volumes:
+      - ./api:/workspace
+      - deps_data:/workspace/deps
+    userns_mode: keep-id 
+    stdin_open: true # Necessary for dev containers
+    tty: true # Necessary for dev containers
+
+  vue:
+    container_name: time_manager_vue_webapp_dev
+    image: localhost/vue_webapp:dev
+    pull_policy: build
+    build:
+      context: ./webapp
+      dockerfile: Containerfile.dev
+    depends_on:
+      - phoenix 
+    ports:
+      - "5173:5173"
+    # Mounting project files as a volume to make a devcontainer
+    volumes:
+      - ./webapp:/workspace:cached
+    networks:
+      - frontend
+    userns_mode: keep-id 
+    stdin_open: true # Necessary for dev containers
+    tty: true # Necessary for dev containers
+
+

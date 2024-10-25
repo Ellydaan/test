@@ -1,0 +1,46 @@
+name: production 
+
+networks:
+  backend:
+  frontend:
+
+services:
+  postgres:
+    container_name: time_manager_postgres_prd
+    image: docker.io/postgres
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    env_file: .env.prd
+    restart: unless-stopped
+    networks:
+      - backend
+
+  phoenix:
+    container_name: time_manager_phoenix_api_prd
+    image: phoenix_api:prd
+    pull_policy: build 
+    env_file: .env.prd
+    depends_on:
+      - postgres 
+    ports:
+      - "4000:4000"
+    networks:
+      - backend 
+      - frontend
+    userns_mode: keep-id 
+    stdin_open: true # Necessary for dev containers
+    tty: true # Necessary for dev containers
+
+  nginx-vue:
+    container_name: time_manager_vue_webapp_prd
+    image: vue_webapp:prd
+    pull_policy: build
+    depends_on:
+      - phoenix 
+    ports:
+      - "8080:80"
+    networks:
+      - frontend
+    stdin_open: true # Necessary for dev containers
+    tty: true # Necessary for dev containers

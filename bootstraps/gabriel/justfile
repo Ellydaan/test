@@ -1,0 +1,5 @@
+create-db:
+    podman run --detach --name db  -p 5433:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres
+
+remove-db:
+    podman rm -f db
