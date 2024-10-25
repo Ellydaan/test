@@ -5,7 +5,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install && npm run build
+RUN npm install 
+RUN npm run build
 
 FROM docker.io/nginx:alpine as production-stage
 
